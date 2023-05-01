@@ -1,0 +1,46 @@
+server:
+  port: 8089
+  tomcat:
+    relaxed-query-chars: '|,{,},[,]'
+#postgre
+spring:
+  graphql:
+    graphiql:
+      enabled: true
+  datasource:
+    url: jdbc:postgresql://postgresql.postgresql.svc.cluster.local:5432/invoice
+    username: testadmin
+    password: testadmin123
+#     url: jdbc:postgresql://localhost:5432/invoicedb
+#     username: postgres
+#     password: 1234
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/invoice
+#    username: postgres
+#    password: admin
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/invoice
+#    username: postgres
+#    password: root
+
+  ## Hibernate Properties
+  # The SQL dialect makes Hibernate generate better SQL for the chosen database
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+
+    # Hibernate ddl auto (create, create-drop, validate, update)
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+services:
+  admin:
+    address: "http://localhost"
+    port: "9091"
+
+  organization:
+    address: "http://localhost"
+    port: "9092"
+

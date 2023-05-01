@@ -1,0 +1,33 @@
+type Invoice
+{
+    id: ID!
+    title: String
+    description: String
+    orgId: String
+    branchId: String
+    customerId: String
+    currencyId: String
+    dueDate: String
+    paymentMode: String
+    status: String
+    customerPayload: String
+    discountId: String
+    taxId: String
+    remark: String
+    note: String
+}
+
+type PaginatedInvoices
+{
+
+    content: [Invoice]
+    totalPages: Int!
+    totalElements: Int!
+    last: Boolean!
+}
+
+type Query {
+    allInvoices(page: Int!, page_size: Int!): PaginatedInvoices
+    findByCustomerId(customer_id:String!,status:String!,page: Int!, page_size: Int!):PaginatedInvoices
+    findByOrganizationId(org_id:String!,status:String!,page: Int!, page_size: Int!):PaginatedInvoices
+}

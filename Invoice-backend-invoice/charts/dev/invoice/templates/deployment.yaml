@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "invoice.fullname" . }}
+  labels:
+    {{- include "invoice.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "invoice.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "invoice.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          #livenessProbe:
+            #httpGet:
+              #path: /
+              #port: http
+          #readinessProbe:
+            #httpGet:
+              #path: /
+              #port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+          - name: SERVER_PORT
+            value: {{ .Values.service.port | quote }}
+          - name: POSTGRES_DATABASE
+            value: {{ .Values.postgres.databaseName | quote }}
+          - name: POSTGRES_PORT
+            value: {{ .Values.postgres.port | quote }}
+          - name: POSTGRES_KEYSPACE
+            value: {{ .Values.postgres.keyspace | quote }}
+          - name: POSTGRES_CONTACTPOINTS
+            value: {{ index .Values.postgres "contact-points" | quote }}
+          - name: POSTGRES_USERNAME
+            value: {{ .Values.postgres.userName | quote }}
+          - name: POSTGRES_PASSWORD
+            value: {{ .Values.postgres.userName | quote }} 
+          - name: SERVICES_CUSTOMER_ADDRESS
+            value: {{ .Values.services.customer.address | quote }}
+          - name: SERVICES_CUSTOMER_PORT
+            value: {{ .Values.services.customer.port | quote }} 
+          - name: SERVICES_ORGANIZATION_ADDRESS
+            value: {{ .Values.services.organization.address | quote }}                       
+          - name: SERVICES_ORGANIZATION_PORT
+            value: {{ .Values.services.organization.port | quote }}    
+          - name: SERVICES_ADMIN_ADDRESS
+            value: {{ .Values.services.admin.address | quote }}                       
+          - name: SERVICES_ADMIN_PORT
+            value: {{ .Values.services.admin.port | quote }}             
+              
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
